@@ -9,7 +9,6 @@ I'm a **Software Developer** from the **Philippines**. I enjoy the process of bu
 
 * 🌱 I’m currently learning **Workflow Automation** and building my **portfolio**. My goal is to use this skill to build my personal automation like **job search and job application**.
 * 💬 Ask me about **Web Development, Android App Development, AI, Workflow Automation**. I'm particularly enthusiastic about **using Python libraries like OpenCV with AI models** and **web crawling/scraping into data presentation**.
-* 📫 How to reach me: The best way to get in touch is by **[email](jerrymarsantos16@gmail.com)**. I'm always open to discussing new opportunities or collaborating on interesting projects.
 * ⚡ Fun fact: **I spent my Senior High School in AMA Computer Learning Center**!
 
 
