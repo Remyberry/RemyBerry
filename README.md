@@ -1,4 +1,4 @@
-### Nyahallo 👋
+### allo 👋
 
 I'm a **Software Developer** from the **Philippines**. I enjoy the process of building things from the ground up, dismantling systems, and creating solutions. I'm also deeply committed to continuous learning and believe in the power of collaboration.
 
