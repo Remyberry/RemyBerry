@@ -38,6 +38,16 @@
             background: #6e8e3a;
         }
 
+        ::selection {
+            background-color: #6e8e3a;
+            color: white;
+        }
+
+        ::-moz-selection {
+            background-color: #6e8e3a;
+            color: white;
+        }
+
         .gradient-text {
             background: linear-gradient(135deg, #FFD1A6, #C08A6B);
             background-clip: text;
@@ -69,10 +79,54 @@
                 transform: translateY(-50px);
             }
         }
+
+        /* Custom Cursor Styles */
+        @media (min-width: 768px) {
+            * {
+                cursor: none !important;
+            }
+        }
+        
+        #custom-cursor, #custom-cursor-outline {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            mix-blend-mode: screen;
+        }
+
+        #custom-cursor {
+            width: 8px;
+            height: 8px;
+            background-color: #C08A6B;
+            transition: transform 0.2s ease-out;
+        }
+
+        #custom-cursor-outline {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #C08A6B;
+            transition: width 0.3s ease-out, height 0.3s ease-out, transform 0.3s ease-out;
+            z-index: 9998;
+        }
+        
+        .cursor-hover-active #custom-cursor {
+            transform: translate(-50%, -50%) scale(4);
+        }
+        
+        .cursor-hover-active #custom-cursor-outline {
+            transform: translate(-50%, -50%) scale(0);
+        }
     </style>
 </head>
 
 <body>
+    <div id="custom-cursor" class="hidden md:block"></div>
+    <div id="custom-cursor-outline" class="hidden md:block"></div>
+
     <header class="py-4 px-4 md:px-8 w-full fixed top-0 bg-[#1a120b]/90 backdrop-blur-sm z-50">
         <nav class="container mx-auto flex justify-between items-center">
             <a href="#" class="text-2xl font-bold gradient-text">
@@ -93,7 +147,7 @@
                 Hi, I'm <span class="gradient-text">Jerry Santos.</span>
             </h1>
             <p class="text-lg md:text-2xl text-gray-400 max-w-8xl mb-8">
-                A <s>slightly</s> motivated Computer Science graduate.
+                A <s>slightly</s> motivated polymath for the modern tech stack.
             </p>
             <div class="flex items-center space-x-6 mt-4">
                 <a href="#projects" class="button-hover px-6 py-3 bg-[#6B4E3B] text-white rounded-full font-semibold shadow-lg hover:bg-[#C08A6B] transition-colors duration-200">
@@ -389,23 +443,98 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const flashlight = document.getElementById('flashlight');
-            const color = 'rgba(94, 62, 34, 0.15)';
+            const cursor = document.getElementById('custom-cursor');
+            const cursorOutline = document.getElementById('custom-cursor-outline');
+            
+            let mouseX = -1000;
+            let mouseY = -1000;
+            let currentX = -1000;
+            let currentY = -1000;
+            let cursorX = -1000;
+            let cursorY = -1000;
+            let outlineX = -1000;
+            let outlineY = -1000;
+
+            const updateLoop = (time) => {
+                if (mouseX === -1000) {
+                    flashlight.style.background = 'transparent';
+                    if (cursor) cursor.style.display = 'none';
+                    if (cursorOutline) cursorOutline.style.display = 'none';
+                    requestAnimationFrame(updateLoop);
+                    return;
+                }
+
+                if (cursor) cursor.style.display = 'block';
+                if (cursorOutline) cursorOutline.style.display = 'block';
+
+                // Flashlight logic: Smoothly follow the cursor for a "heavy" feel
+                currentX += (mouseX - currentX) * 0.15;
+                currentY += (mouseY - currentY) * 0.15;
+
+                // Add soft swaying motion to flashlight
+                const swayX = Math.sin(time * 0.0015) * 12;
+                const swayY = Math.cos(time * 0.002) * 8;
+
+                // Add soft blinking/flicker intensity
+                const flicker = 0.14 + Math.sin(time * 0.005) * 0.01 + (Math.random() * 0.005);
+                const color = `rgba(94, 62, 34, ${flicker})`;
+
+                const fx = currentX + swayX;
+                const fy = currentY + swayY;
+
+                flashlight.style.background = `radial-gradient(600px at ${fx}px ${fy}px, ${color}, transparent 80%)`;
+
+                // Cursor logic: Even smoother trailing for the outline
+                cursorX += (mouseX - cursorX) * 0.5;
+                cursorY += (mouseY - cursorY) * 0.5;
+                outlineX += (mouseX - outlineX) * 0.15;
+                outlineY += (mouseY - outlineY) * 0.15;
+
+                if (cursor) {
+                    cursor.style.left = `${cursorX}px`;
+                    cursor.style.top = `${cursorY}px`;
+                }
+                if (cursorOutline) {
+                    cursorOutline.style.left = `${outlineX}px`;
+                    cursorOutline.style.top = `${outlineY}px`;
+                }
+
+                requestAnimationFrame(updateLoop);
+            };
+
+            requestAnimationFrame(updateLoop);
+
+            const handleMove = (x, y) => {
+                mouseX = x;
+                mouseY = y;
+                if (currentX === -1000) {
+                    currentX = mouseX; currentY = mouseY;
+                    cursorX = mouseX; cursorY = mouseY;
+                    outlineX = mouseX; outlineY = mouseY;
+                }
+            };
 
             document.body.addEventListener('mousemove', (event) => {
-                const { clientX: x, clientY: y } = event;
-                flashlight.style.background = `radial-gradient(600px at ${x}px ${y}px, ${color}, transparent 80%)`;
+                handleMove(event.clientX, event.clientY);
             });
 
             document.body.addEventListener('touchmove', (event) => {
                 if (event.touches.length > 0) {
                     const touch = event.touches[0];
-                    const { clientX: x, clientY: y } = touch;
-                    flashlight.style.background = `radial-gradient(600px at ${x}px ${y}px, ${color}, transparent 80%)`;
+                    handleMove(touch.clientX, touch.clientY);
                 }
             });
 
             document.body.addEventListener('mouseleave', () => {
-                flashlight.style.background = 'transparent';
+                mouseX = -1000;
+                mouseY = -1000;
+            });
+
+            // Handle hover states for interactive elements
+            const interactives = 'a, button, .button-hover, .project-card, input, textarea';
+            document.querySelectorAll(interactives).forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover-active'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover-active'));
             });
         });
     </script>
